@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./base64.js"></script>
+    <script type="text/javascript" src="./vgcaplugin.js"></script>
+    <script type="text/javascript">
+        function GetVersionCallBack(rv) {
+            var received_msg = JSON.parse(rv);
+            if (received_msg.Status == 0) {
+                document.getElementById("_signature").value = received_msg.Version;
+            } else {
+                alert("Ký số không thành công:" + received_msg.Status + ":" + received_msg.Message);
+            }
+        }
+		
+		function exc_get_version() {
+            try {
+                vgca_get_version(GetVersionCallBack);
+            } catch (err)
+            {
+                var prms = {};
+                prms["Status"] = 503;
+                prms["Message"] = err.message; 
+                GetVersionCallBack(JSON.stringify(prms));
+            }
+        }
+		
+        function SignCallBack(sender, rv) {
+            var received_msg = JSON.parse(rv);
+			if(received_msg.Status == 0){
+				document.getElementById("_signature").value = received_msg.Signature;
+			}else{
+			    alert("Ký số không thành công:" + received_msg.Status + ":" + received_msg.Message);
+			}
+        }
+
+        function exc_sign_msg(sender) {
+            var hash_value = "mup+syrr5vEMPsE4HGbhj/1Q8gxU4p/YW1rhWc+AydA=";
+            var hash_alg = "SHA256";
+
+            var prms = {};
+            prms["HashAlg"] = hash_alg;
+            prms["HashValue"] = hash_value;
+
+            var json_prms = JSON.stringify(prms);
+
+            vgca_sign_msg(sender, json_prms, SignCallBack);
+        }
+
+
+        function exc_sign_rsa(sender) {
+            var hash_value = "mup+syrr5vEMPsE4HGbhj/1Q8gxU4p/YW1rhWc+AydA=";
+            var hash_alg = "SHA256";
+
+            var prms = {};
+            prms["HashAlg"] = hash_alg;
+            prms["HashValue"] = hash_value;
+
+            var json_prms = JSON.stringify(prms);
+
+            vgca_sign_msg(sender, json_prms, SignCallBack);
+        }
+        function exc_verify_msg(sender) {
+            var prms = {};
+            var hash_value = "mup+syrr5vEMPsE4HGbhj/1Q8gxU4p/YW1rhWc+AydA=";
+			var content = "SABlAGwAbABvACAAVwBvAHIAZAA="
+            var encode = "RSA";
+			var signCert ="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"
+           
+		    prms["Base64Content"] = content;//"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";
+			prms["Signature"] = document.getElementById("_signature").value;			
+			prms["SignerCert"] = signCert;
+            prms["Encode"] = encode;
+			var json_prms = JSON.stringify(prms);
+
+            vgca_verify_msg(json_prms, verifyCallBack);
+        }
+		
+		function verifyCallBack(rv) {
+            var received_msg = JSON.parse(rv);
+			if(received_msg.Status == 0){
+				 alert(rv);
+			}else{
+			    alert(rv);
+			}
+        }
+    </script>
+</head>
+<body>
+    <form id="message_form">
+
+        <div id="page-wrapper">
+            <h1>Plugin Demo</h1>
+
+            <p><textarea id="_signature" cols="80" rows="10" readonly></textarea></p>
+            <p><textarea id="_verifier" cols="80" rows="10"></textarea></p>
+
+			<button type="button" id="_Version" onclick="exc_get_version();">GetVersion</button><br />
+		  
+            <button type="button" id="_Sign1" onclick="exc_sign_msg();">Ký số Hash Value và Đóng gói PKCS#7 Detached</button><br />
+            
+			<button type="button" id="_Verify" onclick="exc_verify_msg();">Verify</button><br />
+            
+
+           
+
+			
+        </div>
+    </form>
+</body>
+</html>
